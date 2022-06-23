@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -9,8 +10,9 @@ import (
 )
 
 func main() {
-	//GET FILE PATH
-	filePath := getFilePath()
+	//GET FILE PATH AND TIME LIMIT PER QUESTION
+	filePath, timeLimite := getParams()
+	fmt.Println(filePath, timeLimite)
 
 	//READ CSV FILE
 	questions := readProblemsFile(filePath)
@@ -18,17 +20,28 @@ func main() {
 	//ASK QUESTIONS
 	askQuestions(questions)
 
+	//SHOW RESULT
+	printResult(questions)
 }
 
-func getFilePath() string {
+func getParams() (string, int64) {
 	filePath := ""
-	if len(os.Args) > 1 {
-		filePath = os.Args[1]
-	} else {
+	timeLimit := int64(30)
+
+	args := os.Args
+	for i, arg := range args {
+		if arg == "-f" && (i+1) < len(args) {
+			filePath = args[i+1]
+		} else if arg == "-t" && (i+1) < len(args) {
+			timeLimit, _ = strconv.ParseInt(args[i+1], 10, 64)
+		}
+	}
+
+	if filePath == "" {
 		filePath = "../../quizgame/main/problems.csv"
 	}
 
-	return filePath
+	return filePath, timeLimit
 }
 
 func readProblemsFile(filePath string) []Question {
@@ -63,4 +76,15 @@ func askQuestions(questions []Question) {
 	for index := range questions {
 		questions[index].Ask()
 	}
+}
+
+func printResult(questions []Question) {
+	correct := 0
+	for _, question := range questions {
+		if question.IsCorrect {
+			correct++
+		}
+	}
+
+	fmt.Printf("Total of %d correct quesitons of %d", correct, len(questions))
 }
