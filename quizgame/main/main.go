@@ -71,20 +71,13 @@ func readProblemsFile(filePath string) []Question {
 
 func askQuestions(questions []Question, timeLimitSeconds int64) {
 
-	keyPressed := make(chan []byte)
-	go func(keyPressed chan []byte) {
-		var b []byte = make([]byte, 1)
-		fmt.Printf("Press ENTER to start.")
-		for {
-			os.Stdin.Read(b)
-			keyPressed <- b
-		}
-	}(keyPressed)
-
 	for {
-		stdin := <-keyPressed
+		fmt.Printf("Press ENTER to start.")
+		var keyPressed []byte = make([]byte, 1)
+		os.Stdin.Read(keyPressed)
+		fmt.Println(keyPressed)
 		enter := append([]byte{}, 10)
-		if stdin[0] == enter[0] {
+		if keyPressed[0] == enter[0] {
 			break
 		}
 	}
